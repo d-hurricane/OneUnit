@@ -23,7 +23,7 @@
         .ЗависитОт("async", "0.3.0")
         .ЗависитОт("autumn", "4.3.9")
         .ЗависитОт("autumn-cli", "1.1.0")
-        .ЗависитОт("autumn-event-publisher", "1.0.0")
+        .ЗависитОт("autumn-event-publisher", "1.0.1")
         .ЗависитОт("autumn-logos", "1.2.0")
         .ЗависитОт("collectionos", "0.7.2")
         .ЗависитОт("coverage", "0.7.0")
