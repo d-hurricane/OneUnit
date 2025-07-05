@@ -1,0 +1,47 @@
+name: Тестирование
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        oscript_version: ['default', 'dev']
+
+    steps:
+      - name: Актуализация
+        uses: actions/checkout@v4.2.2
+      - name: Вычисление версии OneScript
+        shell: bash
+        id: extract_oscript_version
+        run: |
+          set -ex
+          if [ "${{ matrix.oscript_version }}" = "default" ]
+          then
+            extracted_version=$(cat packagedef | grep ".ВерсияСреды(" | sed 's|[^"]*"||' | sed -r 's/".+//' || true)
+            version="${extracted_version:-stable}"
+          else
+            version="${{ matrix.oscript_version }}"
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Установка OneScript
+        uses: otymko/setup-onescript@v1.5
+        with:
+          version: ${{ steps.extract_oscript_version.outputs.version }}
+
+      - name: Установка зависимостей
+        run: |
+          opm install opm
+          opm install -l --dev
+
+      - name: Тестирование
+        run: |
+          oscript ${{ runner.os == 'Windows' && 'src\\cli\\main.os' || 'src/cli/main.os' }} e
